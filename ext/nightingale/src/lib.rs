@@ -1,21 +1,32 @@
 use lazy_static::lazy_static;
 use macroquad::prelude::*;
-use magnus::{define_global_function, function, prelude::*, Error, Ruby};
+use magnus::{define_global_function, function, prelude::*, Error, Ruby, Symbol};
 use std::sync::Mutex;
 
 struct EngineState {
     x: f32,
     y: f32,
+    pressed_left: bool,
+    pressed_right: bool,
+    pressed_up: bool,
+    pressed_down: bool,
 }
 
 lazy_static! {
-    static ref STATE: Mutex<EngineState> = Mutex::new(EngineState { x: 100.0, y: 100.0 });
+    static ref STATE: Mutex<EngineState> = Mutex::new(EngineState {
+        x: 100.0,
+        y: 100.0,
+        pressed_left: false,
+        pressed_right: false,
+        pressed_up: false,
+        pressed_down: false
+    });
 }
 
-fn update_position(dx: f32, dy: f32) {
+fn update_position(x: f32, y: f32) {
     let mut state = STATE.lock().unwrap();
-    state.x += dx as f32;
-    state.y += dy as f32;
+    state.x = x as f32;
+    state.y = y as f32;
 
     if state.x > 800.0 {
         state.x = 0.0;
@@ -25,23 +36,40 @@ fn update_position(dx: f32, dy: f32) {
     }
 }
 
+fn is_key_down_ruby(key_symbol: Symbol) -> bool {
+    let state = STATE.lock().unwrap();
+    let key_str = key_symbol.to_string();
+    match key_str.as_str() {
+        "up" => state.pressed_up,
+        "down" => state.pressed_down,
+        "left" => state.pressed_left,
+        "right" => state.pressed_right,
+        _ => false,
+    }
+}
+
 fn state_engine() {
-    let rt = tokio::runtime::Runtime::new().unwrap();
-    rt.block_on(async {
-        request_new_screen_size(800, 600);
+    macroquad::Window::new("Nightingale Game Engine", async {
         loop {
+            let mut state = STATE.lock().unwrap();
+            state.pressed_left = is_key_down(KeyCode::Left) || is_key_down(KeyCode::A);
+            state.pressed_right = is_key_down(KeyCode::Right) || is_key_down(KeyCode::D);
+            state.pressed_up = is_key_down(KeyCode::Up) || is_key_down(KeyCode::W);
+            state.pressed_down = is_key_down(KeyCode::Down) || is_key_down(KeyCode::S);
+
             clear_background(WHITE);
-            let state = STATE.lock().unwrap();
-            draw_circle(state.x, state.y, 50.0, 50.0, RED);
+            draw_rectangle(state.x, state.y, 50.0, 50.0, RED);
             drop(state);
+
             next_frame().await;
         }
-    });
+    })
 }
 
 #[magnus::init]
 fn init() -> Result<(), Error> {
-    define_global_function("start_game_engine", function!(state_engine, 0))?;
-    define_global_function("update_box_position", function!(update_position, 2))?;
+    define_global_function("start_game_engine", function!(state_engine, 0));
+    define_global_function("update_box_position", function!(update_position, 2));
+    define_global_function("key_down?", function!(is_key_down_ruby, 1));
     Ok(())
 }
