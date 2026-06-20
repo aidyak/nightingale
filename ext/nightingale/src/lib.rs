@@ -1,4 +1,16 @@
-use magnus::{function, prelude::*, Error, Ruby};
+use lazy_static::lazy_static;
+use macroquad::prelude::*;
+use magnus::{define_global_function, function, prelude::*, Error, Ruby};
+use std::sync::Mutex;
+
+struct EngineState {
+    x: f32,
+    y: f32,
+}
+
+lazy_static! {
+    static ref STATE: Mutex<EngineState> = Mutex::new(EngineState { x: 100.0, y: 100.0 });
+}
 
 pub fn hello(subject: String) -> String {
     format!("Hello {subject}, from Rust!")
@@ -13,8 +25,8 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
 
 #[cfg(test)]
 mod tests {
-    use rb_sys_test_helpers::ruby_test;
     use super::hello;
+    use rb_sys_test_helpers::ruby_test;
 
     #[ruby_test]
     fn test_hello() {
