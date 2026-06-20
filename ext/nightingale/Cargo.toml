@@ -14,7 +14,7 @@ lazy_static = "1.5.0"
 macroquad = "0.4.15"
 magnus = "0.8.2"
 rb-sys = { version = "0.9", features = ["stable-api-compiled-fallback"] }
-tokio = { version = "1.52.3", features = ["full"] }
+# tokio = { version = "1.52.3", features = ["full"] }
 
 [build-dependencies]
 rb-sys-env = "0.2.2"
