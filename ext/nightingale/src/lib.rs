@@ -74,7 +74,7 @@ fn state_engine() {
             state.x = state.x.clamp(0.0, 750.0);
             state.y = state.y.clamp(0.0, 550.0);
 
-            clear_background(WHITE);
+            clear_background(BLACK);
             draw_rectangle(state.x, state.y, 50.0, 50.0, RED);
             drop(state);
 
