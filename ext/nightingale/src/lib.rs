@@ -40,19 +40,8 @@ fn state_engine() {
 }
 
 #[magnus::init]
-fn init(ruby: &Ruby) -> Result<(), Error> {
-    let module = ruby.define_module("Nightingale")?;
-    module.define_singleton_method("hello", function!(hello, 1))?;
+fn init() -> Result<(), Error> {
+    define_global_function("start_game_engine", function!(state_engine, 0))?;
+    define_global_function("update_box_position", function!(update_position, 2))?;
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::hello;
-    use rb_sys_test_helpers::ruby_test;
-
-    #[ruby_test]
-    fn test_hello() {
-        assert_eq!("Hello world, from Rust!", hello("world".to_string()));
-    }
 }
