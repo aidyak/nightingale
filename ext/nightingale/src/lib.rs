@@ -6,18 +6,26 @@ use std::sync::Mutex;
 struct EngineState {
     x: f32,
     y: f32,
-    facing_right: bool,
+    facing_direction: FacingDirection,
     pressed_left: bool,
     pressed_right: bool,
     pressed_up: bool,
     pressed_down: bool,
 }
 
+#[derive(Clone, Copy)]
+enum FacingDirection {
+    Left,
+    Right,
+    Up,
+    Down,
+}
+
 lazy_static! {
     static ref STATE: Mutex<EngineState> = Mutex::new(EngineState {
         x: 100.0,
         y: 100.0,
-        facing_right: true,
+        facing_direction: FacingDirection::Right,
         pressed_left: false,
         pressed_right: false,
         pressed_up: false,
@@ -50,40 +58,97 @@ fn is_key_down_ruby(key_symbol: Symbol) -> bool {
     }
 }
 
-fn draw_player(x: f32, y: f32, facing_right: bool) {
-    let direction = if facing_right { 1.0 } else { -1.0 };
+fn draw_player(x: f32, y: f32, facing_direction: FacingDirection) {
     let body = Color::from_rgba(220, 74, 58, 255);
     let wing = Color::from_rgba(84, 132, 183, 255);
     let belly = Color::from_rgba(255, 214, 170, 255);
     let beak = Color::from_rgba(245, 180, 66, 255);
 
-    let body_center = vec2(x + 25.0, y + 29.0);
-    let head_center = vec2(x + 25.0 + direction * 14.0, y + 16.0);
-    let beak_tip = vec2(head_center.x + direction * 18.0, head_center.y + 1.0);
+    match facing_direction {
+        FacingDirection::Up | FacingDirection::Down => {
+            let direction = if matches!(facing_direction, FacingDirection::Up) {
+                -1.0
+            } else {
+                1.0
+            };
+            let body_center = vec2(x + 25.0, y + 29.0);
+            let head_center = vec2(body_center.x, body_center.y + direction * 16.0);
+            let beak_tip = vec2(head_center.x, head_center.y + direction * 18.0);
 
-    draw_circle(body_center.x, body_center.y, 21.0, body);
-    draw_circle(body_center.x + direction * 5.0, body_center.y + 6.0, 12.0, belly);
-    draw_circle(head_center.x, head_center.y, 13.0, body);
-    draw_triangle(
-        vec2(head_center.x + direction * 10.0, head_center.y - 5.0),
-        vec2(head_center.x + direction * 10.0, head_center.y + 6.0),
-        beak_tip,
-        beak,
-    );
-    draw_circle(head_center.x + direction * 5.0, head_center.y - 4.0, 2.5, BLACK);
+            draw_circle(body_center.x, body_center.y, 21.0, body);
+            draw_circle(body_center.x, body_center.y + direction * 5.0, 12.0, belly);
+            draw_circle(head_center.x, head_center.y, 13.0, body);
+            draw_triangle(
+                vec2(head_center.x - 5.0, head_center.y + direction * 10.0),
+                vec2(head_center.x + 6.0, head_center.y + direction * 10.0),
+                beak_tip,
+                beak,
+            );
+            draw_circle(
+                head_center.x + 4.0,
+                head_center.y - direction * 5.0,
+                2.5,
+                BLACK,
+            );
 
-    draw_triangle(
-        vec2(body_center.x - direction * 2.0, body_center.y - 9.0),
-        vec2(body_center.x - direction * 4.0, body_center.y + 13.0),
-        vec2(body_center.x - direction * 27.0, body_center.y + 2.0),
-        wing,
-    );
-    draw_triangle(
-        vec2(x + 6.0 - direction * 2.0, y + 31.0),
-        vec2(x - direction * 16.0, y + 20.0),
-        vec2(x - direction * 10.0, y + 42.0),
-        body,
-    );
+            draw_triangle(
+                vec2(body_center.x - 9.0, body_center.y - direction * 2.0),
+                vec2(body_center.x + 13.0, body_center.y - direction * 4.0),
+                vec2(body_center.x + 2.0, body_center.y - direction * 27.0),
+                wing,
+            );
+            draw_triangle(
+                vec2(body_center.x - 11.0, body_center.y - direction * 22.0),
+                vec2(body_center.x - 20.0, body_center.y - direction * 38.0),
+                vec2(body_center.x + 2.0, body_center.y - direction * 32.0),
+                body,
+            );
+        }
+        FacingDirection::Left | FacingDirection::Right => {
+            let direction = if matches!(facing_direction, FacingDirection::Right) {
+                1.0
+            } else {
+                -1.0
+            };
+            let body_center = vec2(x + 25.0, y + 29.0);
+            let head_center = vec2(x + 25.0 + direction * 14.0, y + 16.0);
+            let beak_tip = vec2(head_center.x + direction * 18.0, head_center.y + 1.0);
+
+            draw_circle(body_center.x, body_center.y, 21.0, body);
+            draw_circle(
+                body_center.x + direction * 5.0,
+                body_center.y + 6.0,
+                12.0,
+                belly,
+            );
+            draw_circle(head_center.x, head_center.y, 13.0, body);
+            draw_triangle(
+                vec2(head_center.x + direction * 10.0, head_center.y - 5.0),
+                vec2(head_center.x + direction * 10.0, head_center.y + 6.0),
+                beak_tip,
+                beak,
+            );
+            draw_circle(
+                head_center.x + direction * 5.0,
+                head_center.y - 4.0,
+                2.5,
+                BLACK,
+            );
+
+            draw_triangle(
+                vec2(body_center.x - direction * 2.0, body_center.y - 9.0),
+                vec2(body_center.x - direction * 4.0, body_center.y + 13.0),
+                vec2(body_center.x - direction * 27.0, body_center.y + 2.0),
+                wing,
+            );
+            draw_triangle(
+                vec2(x + 6.0 - direction * 2.0, y + 31.0),
+                vec2(x - direction * 16.0, y + 20.0),
+                vec2(x - direction * 10.0, y + 42.0),
+                body,
+            );
+        }
+    }
 }
 
 fn state_engine() {
@@ -98,24 +163,26 @@ fn state_engine() {
             let speed = 4.0;
             if state.pressed_left {
                 state.x -= speed;
-                state.facing_right = false;
+                state.facing_direction = FacingDirection::Left;
             }
             if state.pressed_right {
                 state.x += speed;
-                state.facing_right = true;
+                state.facing_direction = FacingDirection::Right;
             }
             if state.pressed_up {
                 state.y -= speed;
+                state.facing_direction = FacingDirection::Up;
             }
             if state.pressed_down {
                 state.y += speed;
+                state.facing_direction = FacingDirection::Down;
             }
 
             state.x = state.x.clamp(0.0, 750.0);
             state.y = state.y.clamp(0.0, 550.0);
 
             clear_background(BLACK);
-            draw_player(state.x, state.y, state.facing_right);
+            draw_player(state.x, state.y, state.facing_direction);
             drop(state);
 
             next_frame().await;
