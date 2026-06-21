@@ -1,5 +1,8 @@
 # Nightingale Play
 
+## Caveats
+All features are in early development and may change without warning.
+
 ## Release notes
 
 Generate draft release notes from git history:
