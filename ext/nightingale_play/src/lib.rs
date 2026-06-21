@@ -152,7 +152,7 @@ fn draw_player(x: f32, y: f32, facing_direction: FacingDirection) {
 }
 
 fn state_engine() {
-    macroquad::Window::new("Nightingale Game Engine", async {
+    macroquad::Window::new("Nightingale Play Game Engine", async {
         loop {
             let mut state = STATE.lock().unwrap();
             state.pressed_left = is_key_down(KeyCode::Left) || is_key_down(KeyCode::A);

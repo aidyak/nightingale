@@ -3,7 +3,7 @@
 # in the ext/ directory.
 
 [workspace]
-members = ["./ext/nightingale"]
+members = ["./ext/nightingale_play"]
 resolver = "2"
 
 [profile.release]

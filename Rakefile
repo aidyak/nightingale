@@ -11,10 +11,10 @@ require "rb_sys/extensiontask"
 
 task build: :compile
 
-GEMSPEC = Gem::Specification.load("nightingale.gemspec")
+GEMSPEC = Gem::Specification.load("nightingale-play.gemspec")
 
-RbSys::ExtensionTask.new("nightingale", GEMSPEC) do |ext|
-  ext.lib_dir = "lib/nightingale"
+RbSys::ExtensionTask.new("nightingale-play", GEMSPEC) do |ext|
+  ext.lib_dir = "lib/nightingale_play"
 end
 
 module ReleaseNotes
@@ -118,7 +118,7 @@ end
 namespace :release do
   desc "Print release notes from the previous tag to HEAD"
   task :notes do
-    version = ENV["VERSION"] || Nightingale::VERSION
+    version = ENV["VERSION"] || NightingalePlay::VERSION
     date = ENV["DATE"] || Date.today.iso8601
     from_ref = ENV["FROM"] || ReleaseNotes.latest_tag
     to_ref = ENV["TO"] || "HEAD"

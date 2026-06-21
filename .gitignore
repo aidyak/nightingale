@@ -12,6 +12,7 @@
 *.a
 mkmf.log
 target/
+PUBLISHING.local.md
 
 # rspec failure tracking
 .rspec_status

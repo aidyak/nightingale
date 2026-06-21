@@ -12,7 +12,7 @@
 - Add lazy_static
 - Add update related function
 - Add dependencies
-- Add nightingale gem
+- Add nightingale-play gem
 
 ### Changed
 - Automate GitHub releases
@@ -40,7 +40,7 @@
 - Add lazy_static
 - Add update related function
 - Add dependencies
-- Add nightingale gem
+- Add nightingale-play gem
 
 ### Changed
 - Make bird face movement direction

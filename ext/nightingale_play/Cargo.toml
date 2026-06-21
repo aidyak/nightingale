@@ -1,6 +1,6 @@
 [package]
-name = "nightingale"
-version = "0.1.0"
+name = "nightingale-play"
+version = "0.2.1"
 edition = "2021"
 authors = ["aidyak <yusei.kaida@giftee.co>"]
 license = "MIT"

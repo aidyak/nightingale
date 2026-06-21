@@ -1,4 +1,4 @@
-# Nightingale
+# Nightingale Play
 
 ## Release notes
 
